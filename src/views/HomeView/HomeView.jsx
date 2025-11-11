@@ -84,6 +84,7 @@ const HomeView = () => {
       abortRef.current.abort()
     }
     abortRef.current = new AbortController()
+
     try {
       const url = `${API_URL}/posts/feed?page=${nextPage}`
       const response = await fetch(url, { headers, signal: abortRef.current.signal })

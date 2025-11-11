@@ -16,7 +16,7 @@ const NavBar = () => {
             <li><NavLink to='/register' className={({isActive}) => isActive ? 'active' : ''}>Register</NavLink></li>
             <li><NavLink to='/explore/events' className={({isActive}) => isActive ? 'active' : ''}>Explore Events</NavLink></li>
             <li><NavLink to='/create' className={({isActive}) => isActive ? 'active' : ''}>Create</NavLink></li>
-            <li><NavLink to='/profile' className={({isActive}) => isActive ? 'active' : ''}>Profile</NavLink></li>
+            <li><NavLink to='/settings' className={({isActive}) => isActive ? 'active' : ''}>Profile</NavLink></li>
         </ul>
       </nav>
     </>

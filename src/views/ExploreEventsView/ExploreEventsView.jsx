@@ -1,39 +1,66 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useId } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import EventCard from '../../components/EventCard/EventCard'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 const ExploreEventsView = () => {
     const { API_URL } = useAuth()
+    const location = useLocation()
     const [date, setDate] = useState("")
     const [events, setEvents] = useState([])
     const [error, setError] = useState("")
+    
     const dateId = useId()
+
+    const allEventsUrl = useMemo(() => `${API_URL}/events`, [API_URL])
+
+    const filterByDay = useCallback((yyyyMmDd) => {
+        const start = new Date(`${yyyyMmDd}T00:00:00`)
+        const end = new Date(start)
+        end.setDate(start.getDate() + 1)
+        const fromIso = start.toISOString()
+        const toIso = end.toISOString()
+        return `${API_URL}/events/search?from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`
+  }, [API_URL])
+
+    const fetchEventsFeed = useCallback(async (url) => {
+        setError("")
+        try {
+            const response = await fetch (url)
+             const data = await response.json().catch(() => (Array.isArray(data) ? data: []))
+            if (!response.ok) {
+                throw new Error(`Events feed failed ( ${response.status})`)
+            }
+            if (!response.ok) {
+                throw new Error(data?.message || `Failed to load events (${response.status})`)
+            }
+            const list = Array.isArray(data) ? data : (data?.items || [])
+            setEvents(Array.isArray(list) ? list : [])
+        } catch (e) {
+            if (e.name !== "AbortError")
+                setEvents([])
+                setError(e.message || "Failed to load events")
+        } 
+    }, [])
+
+    useEffect(() => {
+        fetchEventsFeed(allEventsUrl)
+    }, [allEventsUrl, location.state?.refresh])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setError("")
-        
-        try {
-            let url = `${API_URL}/events`
-            if (date) url += `?date=${encodeURIComponent(date)}` //got chatgpt help here to change url
-            const response = await fetch(url)
-            const data = await response.json().catch(() => [])
-            if (!response.ok) {
-                throw new Error(data?.message || "Failed to load events")
-            }
-            setEvents(Array.isArray(data) ? data : (data?.items || []))
-        } catch (e) {
-            setEvents([])
-            setError(e.message)
-        } 
+        if (!date) {
+            fetchEventsFeed(allEventsUrl)
+            return
+        }
+        fetchEventsFeed(filterByDay(date))
     }
 
     const onClear = () => {
         setDate("")
-        setEvents([])
         setError("")
+        fetchEventsFeed(allEventsUrl)
     }
 
 

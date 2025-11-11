@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import App from "../App";
 
 const AuthContext = createContext(null);
 
@@ -8,7 +9,6 @@ export const useAuth = () => {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://gappd-backend.onrender.com'
-const STORAGE_KEY = 'gappd_auth' //sets key name
 const TOKEN_KEY = 'gappd_token'
 const USER_KEY = 'gappd_user'
 
@@ -116,6 +116,96 @@ export const AuthProvider = ({ children }) => {
         return data
     }
 
+    const updateUser = async (payload) => {
+        if (!token) {
+            throw new Error("Not authorized")
+        }
+        const response = await fetch(`${API_URL}/users/me`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(payload || {})
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            if (response.status === 401) {
+                setToken(null)
+                setUser(null)
+                throw new Error("Session expired.")
+            }
+            throw new Error(data?.message || `Update failed (${response.status})`)
+        }
+        if (data && Object.keys(data).length) {
+            setUser(data)
+            return data
+        } else {
+            try {
+                const currentUserResponse = await fetch(`${API_URL}/users/me`, {
+                    headers: {Authorization: `Bearer ${token}`}
+                })
+                const currentUser = currentUserResponse.ok ? await currentUserResponse.json().catch(() => null) : null
+                setUser(currentUser || user)
+                return currentUser || user
+            } catch {
+                return user
+            }
+        }
+        
+    }
+
+    const updateProfilePicture = async (file) => {
+        if (!token) {
+            throw new Error("Not authorized")
+        }
+        if (!file) {
+            throw new Error("No file selected")
+        }
+        const form = new FormData()
+        form.append("photo", file)
+        const response = await fetch(`${API_URL}/users/me/avatar`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`},
+            body: form
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            if (response.status === 401) {
+                setToken(null)
+                setUser(null)
+                throw new Error("Session expired. Please login again")
+            }
+            throw new Error(data?.message || `Avatar upload failed (${response.status})`)
+        }
+
+        try {
+            const currentUserResponse = await fetch(`${API_URL}/users/me`, {
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            const currentUser = currentUserResponse.ok ? await currentUserResponse.json().catch(() => null) : null
+            setUser(currentUser || user)
+        } catch {
+            return user
+        }
+        return true
+    }
+    
+
+    const deleteUser = async () => {
+        if (!token) {
+            throw new Error("Not authorized")
+        }
+        const response = await fetch(`${API_URL}/users/me`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) {
+            throw new Error(data?.message || `Delete failed (${response.status})`)
+        }
+        setToken(null)
+        setUser(null)
+        return true 
+    }
+
     const logout = () => {
         setToken(null)
         setUser(null)
@@ -130,7 +220,10 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         login,
+        updateUser,
+        updateProfilePicture,
         logout,
+        deleteUser,
         register
     }
 

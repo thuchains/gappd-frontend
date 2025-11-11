@@ -211,18 +211,20 @@ const CreateView = () => {
   }
   const removeCover = () => setEventFields((p) => ({...p, cover:null}))
 
-  const onDrop = (e) => {
-    e.preventDefault()
-    const droppedFiles = Array.from(e.dataTransfer.files || [])
-    if (!droppedFiles.length) {
-      return
-    }
-    if (isEvent) {
-      setEventFields((p) => ({...p, cover: droppedFiles[0]}))
-    } else {
-      setPost((p) => ({...p, images: [...toFileArray(p.images), ...droppedFiles]}))
-    }
-  }
+  // const onDrop = (e) => {
+  //   e.preventDefault()
+  //   const droppedFiles = Array.from(e.dataTransfer.files || [])
+  //   if (!droppedFiles.length) {
+  //     return
+  //   }
+  //   if (isEvent) {
+  //     setEventFields((p) => ({...p, cover: droppedFiles[0]}))
+  //   } else {
+  //     setPost((p) => ({...p, images: [...toFileArray(p.images), ...droppedFiles]}))
+  //   }
+  // }
+
+
 
   const postFiles = toFileArray(post.images)
   const postPreview = useMemo(() => 
@@ -242,7 +244,7 @@ const CreateView = () => {
           <button type='button' className={`${isEvent ? "bg-black text-white" : "bg-white text-black"}`} onClick={() => setActive(Tab.EVENT)} aria-pressed={isEvent}>Create Event Post</button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div onDragOver={(e) => e.preventDefault()} onDrop={onDrop} role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && (isEvent ? coverInputRef.current?.click() : postFileInputRef.current?.click())} aria-label={isEvent ? "Upload cover image" : "Add images"}>
+          <div role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && (isEvent ? coverInputRef.current?.click() : postFileInputRef.current?.click())} aria-label={isEvent ? "Upload cover image" : "Add images"}>
             {isEvent ? (
               <>
                 {coverPreview ? (
@@ -257,7 +259,7 @@ const CreateView = () => {
                 : 
                 (
                   <>
-                    <p>Drag and drop and image here or click to upload a cover image</p>
+                    <p>Click to upload a cover image</p>
                     <button type='button' onClick={() => coverInputRef.current?.click()}>Upload cover</button>
                   </>
                 )}
@@ -276,7 +278,7 @@ const CreateView = () => {
                     ))}
                   </div>
                 )}
-                <p>Drag and drop images here or click to add images</p>
+                <p>Click to add images</p>
                 <button type='button' onClick={() => postFileInputRef.current?.click()}>Add images</button>
               </>
             )}
