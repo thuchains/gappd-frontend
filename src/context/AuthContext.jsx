@@ -7,7 +7,7 @@ export const useAuth = () => {
     return context
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5173'
+const API_URL = import.meta.env.VITE_API_URL || 'https://gappd-backend.onrender.com'
 const STORAGE_KEY = 'gappd_auth' //sets key name
 const TOKEN_KEY = 'gappd_token'
 const USER_KEY = 'gappd_user'

@@ -11,7 +11,8 @@ const Tab = {
 
 const initialPost = { 
   caption: "", 
-  image: null 
+  images: [],
+  location: ""
 }
 
 const initialEvent = { 
@@ -22,13 +23,15 @@ const initialEvent = {
   city: "",
   state: "",
   zipcode: "",
-  country: ""
+  country: "",
+  cover: null
 }
+
+const toFileArray = (f) => Array.isArray(f) ? f : f ? Array.from(f) : []
 
 const CreateView = () => {
   const navigate = useNavigate()
   const { token, API_URL } = useAuth()
-  const fileInputRef = useRef(null)
 
   const [active, setActive] = useState(Tab.POST)
   const [post, setPost] = useState(initialPost)
@@ -39,12 +42,14 @@ const CreateView = () => {
 
   const isEvent = active === Tab.EVENT
 
+  const headers = token ? { Authorization: `Bearer ${token}`} : {}
+
   const validate = () => {
     if (isEvent) {
-      if (!eventFields.title?.trim()) {
+      if (!eventFields.title.trim()) {
         return "Event title is required."
       }
-      if (!eventFields.description?.trim()) {
+      if (!eventFields.description.trim()) {
         return "Event description is required."
       }
       if (!eventFields.start_time) {
@@ -63,7 +68,7 @@ const CreateView = () => {
         return "Event country is required."
       }
     } else {
-      if (!post.caption.trim() && !post.image) {
+      if (!post.caption.trim() && toFileArray(post.images).length === 0) {
         return "Add a caption or an image."
       }
     }
@@ -77,16 +82,17 @@ const CreateView = () => {
     }
     setError("")
     setSuccess("")
-    const validationError = validate()
-    if (validationError) {
-      setError(validationError)
+    const v = validate()
+    if (v) {
+      setError(v)
       return
     }
+
     setSubmitting(true)
     try {
       let response
       if (isEvent) {
-        if (post.image) {
+        if (eventFields.cover) {
           const formData = new FormData()
           formData.append("title", eventFields.title.trim())
           formData.append("description", eventFields.description.trim())
@@ -98,10 +104,10 @@ const CreateView = () => {
           formData.append("state", eventFields.state.trim())
           formData.append("zipcode", eventFields.zipcode.trim())
           formData.append("country", eventFields.country.trim())
-          formData.append("cover_photo", post.image)
+          formData.append("cover_photo", eventFields.cover)
           response = await fetch(`${API_URL}/events`, {
             method: "POST",
-            headers: {...(token ? { Authorization: `Bearer ${token}`} : {})},
+            headers,
             body: formData,
           })
         } else {
@@ -117,7 +123,7 @@ const CreateView = () => {
           }
           response = await fetch(`${API_URL}/events`, {
             method: "POST",
-            headers: {"Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}`} : {})},
+            headers: {"Content-Type": "application/json", ...headers},
             body: JSON.stringify(body),
           })
         }
@@ -126,12 +132,15 @@ const CreateView = () => {
         if (post.caption) {
           formData.append("caption", post.caption)
         }
-        if (post.image) {
-          formData.append("caption", post.image)
+        if (post.location) {
+          formData.append("location", post.location)
         }
+        const files = toFileArray(post.images)
+        files.forEach((f) => formData.append("files", f))
+
         response = await fetch(`${API_URL}/posts`, {
           method: "POST",
-          headers: {...(token ? { Authorization: `Bearer ${token}` }: {})},
+          headers,
           body: formData,
       })
     }
@@ -157,7 +166,6 @@ const CreateView = () => {
     setSuccess(isEvent ? "Event posted!" : "Post Created!")
     setPost(initialPost)
     setEventFields(initialEvent)
-    fileInputRef.current && (fileInputRef.current.value = "")
     navigate(isEvent ? "/explore/events" : "/home", {
       replace: true,
       state: { refresh: Date.now()}
@@ -167,35 +175,63 @@ const CreateView = () => {
   } finally {
     setSubmitting(false)
   }
-}
+  }
 
-  const onChangePost = (e) => setPost((p) => ({...p, [e.target.name]: e.target.value}))
+  const onChangePost = (e) => {const { name, value } = e.target; 
+    setPost((p) => ({...p, [name]: value}))
+  }
+  
+  const onChangeEvent = (e) => {const { name, value } = e.target; 
+    setEventFields((p) => ({...p, [name]: value}))
+  }
 
-  const onChangeEvent = (e) => setEventFields((p) => ({...p, [e.target.name]: e.target.value}))
+  const postFileInputRef = useRef(null)
+  
+  const coverInputRef = useRef(null)
 
-  const onPickFile = (e) => {
-    const file = e.target.files?.[0]
+  const pickPostImages = (e) => {const newFiles = Array.from(e.target.files || []);
+    if (!newFiles.length) {
+      return
+    } 
+    setPost((p) => ({...p, images: [...toFileArray(p.images), ...newFiles]}))
+  }
+
+  const removePostImageAt = (idx) => {
+    setPost((p) => {
+      const array = toFileArray(p.images)
+      return {...p, images: array.filter((_, i) => i !== idx)}
+    })
+  }
+
+  const pickCover = (e) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setPost((p) => ({...p, image: file}))
+      setEventFields((p) => ({...p, cover: file}))
     }
   }
+  const removeCover = () => setEventFields((p) => ({...p, cover:null}))
 
   const onDrop = (e) => {
     e.preventDefault()
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      setPost((p) => ({...p, image: file}))
+    const droppedFiles = Array.from(e.dataTransfer.files || [])
+    if (!droppedFiles.length) {
+      return
+    }
+    if (isEvent) {
+      setEventFields((p) => ({...p, cover: droppedFiles[0]}))
+    } else {
+      setPost((p) => ({...p, images: [...toFileArray(p.images), ...droppedFiles]}))
     }
   }
 
-  const removeImage = () => {
-    setPost((p) => ({...p, image: null}))
-    fileInputRef.current && (fileInputRef.current.value = "")
-  }
+  const postFiles = toFileArray(post.images)
+  const postPreview = useMemo(() => 
+    postFiles.map((f) => URL.createObjectURL(f)
+  ), [postFiles])
 
-  const previewUrl = useMemo(() => (
-    post.image ? URL.createObjectURL(post.image) : ""
-  ), [post.image])
+  const coverPreview = useMemo(() => (
+    eventFields.cover ? URL.createObjectURL(eventFields.cover) : ""
+  ), [eventFields.cover])
 
 
   return (
@@ -206,37 +242,65 @@ const CreateView = () => {
           <button type='button' className={`${isEvent ? "bg-black text-white" : "bg-white text-black"}`} onClick={() => setActive(Tab.EVENT)} aria-pressed={isEvent}>Create Event Post</button>
         </div>
         <form onSubmit={handleSubmit}>
-          <div onDragOver={(e) => e.preventDefault()} onDrop={onDrop} role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()} aria-label='Upload Image'>
-            {post.image ? 
-            (
-              <div>
-                <img src={previewUrl}/>
-                <div>
-                  <button type='button' onClick={() => fileInputRef.current?.click()}>Change Image</button>
-                  <button type='button' onClick={removeImage}>Remove</button>
-                </div>
-              </div>
-            )
+          <div onDragOver={(e) => e.preventDefault()} onDrop={onDrop} role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && (isEvent ? coverInputRef.current?.click() : postFileInputRef.current?.click())} aria-label={isEvent ? "Upload cover image" : "Add images"}>
+            {isEvent ? (
+              <>
+                {coverPreview ? (
+                  <div>
+                    <img src={coverPreview} alt="cover preview"/>
+                    <div>
+                      <button type='button' onClick={() => coverInputRef.current?.click()}>Change cover</button>
+                      <button type='button' onClick={removeCover}>Remove</button>
+                    </div>
+                  </div>
+                )
+                : 
+                (
+                  <>
+                    <p>Drag and drop and image here or click to upload a cover image</p>
+                    <button type='button' onClick={() => coverInputRef.current?.click()}>Upload cover</button>
+                  </>
+                )}
+              </>
+            ) 
             :
             (
               <>
-                <p>Drag and drop and image here, or click to upload</p>
-                <button type='button' onClick={() => fileInputRef.current?.click()}>Choose Image</button>
+                {postPreview.length > 0 && (
+                  <div>
+                    {postPreview.map((src, idx) => (
+                      <div key={idx}>
+                        <img src={src} alt="" />
+                        <button type='button' onClick={() => removePostImageAt(idx)}>Remove image</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p>Drag and drop images here or click to add images</p>
+                <button type='button' onClick={() => postFileInputRef.current?.click()}>Add images</button>
               </>
             )}
-            <input type="file" ref={fileInputRef} accept='image/*' className='hidden' onChange={onPickFile} />
+            <input type="file" ref={postFileInputRef} accept='image/*' multiple hidden onChange={pickPostImages} />
+            <input type="file" ref={coverInputRef} accept='image/*' hidden onChange={pickCover} />
           </div>
           {!isEvent && (
             <div>
-              <label htmlFor="caption">Caption</label>
-              <textarea name='caption' value={post.caption} onChange={onChangePost} placeholder='Write a caption...' rows={3}/>
+              <div>
+                <label htmlFor="caption">Caption</label>
+                <textarea name="caption" id="caption" value={post.caption} onChange={onChangePost} placeholder='Write a caption...' rows={3}/>
+              </div>
+              <div>
+                <label htmlFor="location">Location</label>
+                <input type="text" name="location" id="location" value={post.location} onChange={onChangePost} />
+              </div>
             </div>
           )}
+        
           {isEvent && (
             <div>
               <div className='title-container'>
                 <label htmlFor="title">Title</label>
-                <input type="text" value={eventFields.title} onChange={onChangeEvent} placeholder='Enter event title' required />
+                <input type="text" name='title' value={eventFields.title} onChange={onChangeEvent} placeholder='Enter event title' required />
               </div>
               <div className='description-container'>
                 <label htmlFor="description">Description</label>
@@ -269,7 +333,7 @@ const CreateView = () => {
                   <label htmlFor="country">Country</label>
                   <input type="text" name="country" id="country" value={eventFields.country} onChange={onChangeEvent} required />
                 </div>
-              </div>
+              </div>  
             </div>
           )}
           {error && (<div>{error}</div>)}

@@ -33,7 +33,7 @@ const timeAgo = (dateString) => {
 
 
 const HomeView = () => {
-  const { API_URL, token, user } = useAuth()
+  const { API_URL, token } = useAuth()
   const sentinelRef = useRef(null) //got from internet
   const abortRef = useRef(null)
   const location = useLocation()
@@ -61,9 +61,14 @@ const HomeView = () => {
       const data = await response.json()
       const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : []
       setFeed(items)
+      setPage(1)
+      const totalPages = data?.pages ?? (items.length ? 2: 1)
+      setHasMore(1 < totalPages)
     } catch (e) {
       setError(e.message || "Failed to load feed")
-    } 
+      setFeed([])
+      setHasMore(false)
+    }
   }, [API_URL, headers])
 
   const fetchPage = useCallback(async(nextPage = 1, append = false) => {
@@ -73,6 +78,7 @@ const HomeView = () => {
     setError("")
     if (append) {
       setLoadingMore(true)
+      setError("")
     }
     if (abortRef.current) {
       abortRef.current.abort()
@@ -87,10 +93,10 @@ const HomeView = () => {
       const data = await response.json()
 
       const items = Array.isArray(data?.items) ? data.items : []
-      const totalPages = data?.pages ?? (items.length ? page + 1 : page)
+      const totalPages = data?.pages ?? (items.length ? nextPage + 1 : nextPage)
       const more = nextPage < totalPages
 
-      setFeed(prev => (append ? [...prev, ...items] : items))
+      setFeed((prev) => (append ? [...prev, ...items] : items))
       setHasMore(more)
       setPage(nextPage)
     } catch (e) {
@@ -109,7 +115,7 @@ const HomeView = () => {
     loadFeed(),
     setHasMore(true);
     setError("");
-  }, [API_URL, token])
+  }, [API_URL, token, loadFeed])
 
   useEffect(() => {
     if (location.state?.refresh) {
@@ -138,7 +144,7 @@ const HomeView = () => {
   }, [page, hasMore, loadingMore, feed.length, fetchPage])
 
   const toggleLike = async (postId, alreadyLiked) => {
-    setFeed((prev) => prev.map((p) => p.id === postId ? {...p, liked: !alreadyLiked, likes_count: (p.likes_count || 0) + (alreadyLiked ? -1 : 1)} : p))
+    setFeed((prev) => prev.map((p) => p.id === postId ? {...p, liked: !alreadyLiked, likes_count: (p.likes_count || 0) + (alreadyLiked ? 1 : -1)} : p))
     try {
       const response = await fetch(`${API_URL}/posts/${postId}/like`, {
         method: "POST",
@@ -155,8 +161,6 @@ const HomeView = () => {
   const addComment = async (postId, text) => {
     setFeed((prev) => prev.map((p) => p.id === postId ? {...p, comments_count: (p.comments_count || 0) + 1} : p))
   }
-
-
 
   return (
     <>
