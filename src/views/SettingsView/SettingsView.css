@@ -1,0 +1,359 @@
+/* SettingsView - Settings page styling */
+.settings-view-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.settings-view-content {
+  width: 100%;
+  max-width: 680px;
+}
+
+.settings-view-content h1 {
+  margin: 0 0 32px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+/* Settings sections */
+.settings-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.settings-section h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Avatar section */
+.avatar-preview-container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.avatar-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  background: var(--muted-surface);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-display img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-display-empty {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.avatar-controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
+.avatar-input-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--muted-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.avatar-input-label:hover {
+  border-color: var(--accent);
+  background: rgba(74, 158, 255, 0.04);
+}
+
+.avatar-input-label input {
+  display: none;
+}
+
+.avatar-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.avatar-buttons button {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.avatar-buttons button:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 2px 8px rgba(74, 158, 255, 0.2);
+}
+
+.avatar-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.avatar-buttons button.secondary {
+  background: var(--muted-surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.avatar-buttons button.secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+/* Form styling */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-form label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+.settings-form input,
+.settings-form textarea {
+  padding: 10px 12px;
+  background: var(--muted-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 200ms ease;
+}
+
+.settings-form input::placeholder,
+.settings-form textarea::placeholder {
+  color: var(--muted);
+}
+
+.settings-form input:focus,
+.settings-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+  background: rgba(74, 158, 255, 0.02);
+}
+
+.settings-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Message boxes */
+.message-box {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.message-box.error {
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.2);
+}
+
+.message-box.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Delete account section */
+.delete-warning {
+  padding: 12px 14px;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.15);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.delete-confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delete-confirmation input {
+  padding: 10px 12px;
+  background: var(--muted-surface);
+  border: 1px solid rgba(255, 71, 87, 0.2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 200ms ease;
+}
+
+.delete-confirmation input:focus {
+  outline: none;
+  border-color: #ff4757;
+  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+}
+
+.delete-button {
+  padding: 12px 16px;
+  background: #ff4757;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.delete-button:hover:not(:disabled) {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Action buttons */
+.settings-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-actions button {
+  padding: 12px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.settings-actions button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+.settings-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-actions button.secondary {
+  background: var(--muted-surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.settings-actions button.secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.settings-actions button.danger {
+  background: #ff4757;
+}
+
+.settings-actions button.danger:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .settings-view-content h1 {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .settings-section {
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  .avatar-preview-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .avatar-display {
+    margin: 0 auto;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-actions {
+    flex-direction: column;
+  }
+
+  .settings-actions button {
+    width: 100%;
+  }
+}

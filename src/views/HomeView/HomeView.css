@@ -1,0 +1,23 @@
+/* Center the feed */
+.home-view-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.home-view-feed {
+  width: 100%;
+  max-width: 720px;
+}
+
+.home-view-feed ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-view-feed li {
+  margin: 0;
+}

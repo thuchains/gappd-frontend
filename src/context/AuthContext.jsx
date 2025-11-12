@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
             body: JSON.stringify({ email, password })
         })
         const data = await response.json().catch(() => ({}))
-
+        
         if (!response.ok) {
             if (response.status == 401 || response.status === 403) {
                 throw new Error("Invalid email or password.")

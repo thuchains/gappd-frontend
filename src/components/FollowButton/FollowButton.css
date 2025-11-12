@@ -1,0 +1,19 @@
+.follow-btn{
+	background:transparent;
+	border:1px solid var(--border);
+	color:var(--text);
+	padding:6px 10px;
+	border-radius:8px;
+	cursor:pointer;
+	transition:background var(--transition), color var(--transition), transform var(--transition);
+}
+
+.follow-btn.primary{
+	background:linear-gradient(90deg,var(--accent), rgba(255,107,0,0.85));
+	color:#0b0b0d;
+	border:none;
+}
+
+.follow-btn.small{ padding:4px 8px; font-size:13px }
+
+.follow-btn:hover{ transform:translateY(-2px) }

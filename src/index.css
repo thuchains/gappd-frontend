@@ -1,0 +1,67 @@
+:root{
+  /* Modern, refined, contemporary luxury palette */
+  --bg: #0f1112;            /* deep charcoal background */
+  --surface: #161718;       /* near-black stone surface for cards */
+  --muted-surface: #202122; /* soft stone panel */
+  --text: #f7f6f5;          /* warm off-white text */
+  --muted: #9a9a9a;         /* neutral muted grey */
+  --accent: #b06a3a;       /* refined copper accent (luxury pop) */
+  --accent-2: #6aa5a0;     /* soft teal-secondary accent */
+  --danger: #ff5a6e;       /* refined red for destructive actions */
+  --card-radius: 12px;
+  --glass: rgba(201,166,107,0.06);
+  --border: rgba(176,106,58,0.10);
+  --transition: 200ms;
+}
+
+/* Light theme override - applied when .light-theme is present on <html> */
+.light-theme {
+  /* Flat white light theme per user request */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --muted-surface: #ffffff;
+  --text: #0f1112; /* dark text on white */
+  --muted: #7a7a7a;
+  --accent: #b06a3a; /* keep copper accent in light mode */
+  --accent-2: #4a9f99;
+  --danger: #d9534f;
+  --glass: rgba(176,106,58,0.04);
+  --border: rgba(15,20,32,0.06);
+}
+
+/* When light theme is active make the page background a flat white (no gradient) */
+.light-theme body {
+  background: var(--bg);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  background: linear-gradient(180deg, var(--bg), #1f1f1f 140%);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.35;
+  margin: 0;
+}
+
+a { color: inherit; }
+img { max-width: 100%; display: block }
+
+/* small utilities */
+.card {
+  background: linear-gradient(180deg, var(--surface), var(--muted-surface));
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border);
+}
+
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+
+/* focus ring */
+.focus-ring:focus {
+  /* subtle warm-gold focus ring using accent */
+  outline: 2px solid rgba(201,166,107,0.12);
+  outline-offset: 2px;
+}

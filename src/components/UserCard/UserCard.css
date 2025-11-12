@@ -1,0 +1,29 @@
+.usercard{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:10px;
+  border-radius:10px;
+  background:var(--muted-surface);
+  border:1px solid var(--border);
+}
+
+.usercard-avatar{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,0.04);
+}
+
+.usercard-body{ flex:1 }
+
+.usercard-top{ display:flex; justify-content:space-between; align-items:center }
+
+.usercard-name{ font-weight:700; color:var(--text) }
+
+.usercard-username{ color:var(--muted); font-size:13px }
+
+.usercard-bio{ margin-top:6px; color:var(--muted); font-size:13px }
+
+.usercard-action{ margin-left:12px }

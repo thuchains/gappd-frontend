@@ -1,8 +1,42 @@
-import React from 'react'
+import React, { useCallback } from 'react'
+import { useAuth } from '../../context/AuthContext'
 
-const FollowButton = () => {
+const FollowButton = ({ targetUserId, initialFollowing=false, onChange }) => {
+  const { API_URL, token } = useAuth()
+  const [following, setFollowing] = useState(!initialFollowing)
+  const [busy, setBusy] = useState(false)
+
+  const toggle = useCallback(async () => {
+    if (!targetUserId || busy) {
+      return
+    }
+    setBusy(true)
+    const next = !following
+    setFollowing(next)
+    onChange?.(next)
+    try {
+      const response = await fetch(`${API_URL}/users/${targetUserId}/follow`, {
+        method: next ? "POST" : "DELETE",
+        headers: { Authorization: `Bearer ${token || ""}`}
+      })
+      if (!response.ok) {
+        throw new Error("Follow toggle failed")
+      }
+    } catch (e) {
+      console.error(e)
+      setFollowing(!next)
+      onChange?.(!next)
+      alert("Could not update follow status.")
+    } finally {
+      setBusy(false)
+    }
+  }, [API_URL, token, targetUserId, following, busy, onChange])
+
+
   return (
-    <div>FollowButton</div>
+    <>
+      <button type='button' onClick={toggle} disabled={busy}>Follow</button>
+    </>
   )
 }
 

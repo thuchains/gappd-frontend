@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMemo, useRef, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import './CreateView.css'
 
 
 const Tab = {
@@ -149,12 +150,14 @@ const CreateView = () => {
       let msg = `Request failed with ${response.status}`
       try {
         const data = await response.json()
-        if (typeof data === "string") {
-          msg = data
+        if (data?.errors) {
+          msg = JSON.stringify(data.errors)
         } else if (data?.message) {
           msg = data.message
         } else if (data?.error) {
           msg = data.error
+        } else if (typeof data === "string") {
+          msg = data
         } else if (typeof data === "object") {
           msg = JSON.stringify(data)
         }
@@ -238,112 +241,114 @@ const CreateView = () => {
 
   return (
     <>
-      <div>
-        <div>
-          <button type='button' className={`${!isEvent ? "bg-black text-white": "bg-white text-black"}`} onClick={() => setActive(Tab.POST)} aria-pressed={!isEvent}>Create Post</button>
-          <button type='button' className={`${isEvent ? "bg-black text-white" : "bg-white text-black"}`} onClick={() => setActive(Tab.EVENT)} aria-pressed={isEvent}>Create Event Post</button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && (isEvent ? coverInputRef.current?.click() : postFileInputRef.current?.click())} aria-label={isEvent ? "Upload cover image" : "Add images"}>
-            {isEvent ? (
-              <>
-                {coverPreview ? (
-                  <div>
-                    <img src={coverPreview} alt="cover preview"/>
-                    <div>
-                      <button type='button' onClick={() => coverInputRef.current?.click()}>Change cover</button>
-                      <button type='button' onClick={removeCover}>Remove</button>
-                    </div>
-                  </div>
-                )
-                : 
-                (
-                  <>
-                    <p>Click to upload a cover image</p>
-                    <button type='button' onClick={() => coverInputRef.current?.click()}>Upload cover</button>
-                  </>
-                )}
-              </>
-            ) 
-            :
-            (
-              <>
-                {postPreview.length > 0 && (
-                  <div>
-                    {postPreview.map((src, idx) => (
-                      <div key={idx}>
-                        <img src={src} alt="" />
-                        <button type='button' onClick={() => removePostImageAt(idx)}>Remove image</button>
+      <div className="create-view-container">
+        <div className="create-view-form">
+          <div className="create-tabs">
+            <button type='button' className={!isEvent ? "active" : ""} onClick={() => setActive(Tab.POST)} aria-pressed={!isEvent}>Create Post</button>
+            <button type='button' className={isEvent ? "active" : ""} onClick={() => setActive(Tab.EVENT)} aria-pressed={isEvent}>Create Event</button>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="upload-area" role='button' tabIndex={0} onKeyDown={(e) => e.key === "Enter" && (isEvent ? coverInputRef.current?.click() : postFileInputRef.current?.click())} aria-label={isEvent ? "Upload cover image" : "Add images"}>
+              {isEvent ? (
+                <>
+                  {coverPreview ? (
+                    <div className="cover-preview">
+                      <img src={coverPreview} alt="cover preview"/>
+                      <div className="cover-actions">
+                        <button type='button' onClick={() => coverInputRef.current?.click()}>Change</button>
+                        <button type='button' onClick={removeCover}>Remove</button>
                       </div>
-                    ))}
-                  </div>
-                )}
-                <p>Click to add images</p>
-                <button type='button' onClick={() => postFileInputRef.current?.click()}>Add images</button>
-              </>
+                    </div>
+                  )
+                  : 
+                  (
+                    <>
+                      <p>Click to upload a cover image</p>
+                      <button type='button' onClick={() => coverInputRef.current?.click()}>Upload Cover</button>
+                    </>
+                  )}
+                </>
+              ) 
+              :
+              (
+                <>
+                  {postPreview.length > 0 && (
+                    <div className="image-preview-grid">
+                      {postPreview.map((src, idx) => (
+                        <div key={idx} className="image-preview-item">
+                          <img src={src} alt="" />
+                          <button type='button' className="remove-btn" onClick={() => removePostImageAt(idx)}>×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p>Click to add images</p>
+                  <button type='button' onClick={() => postFileInputRef.current?.click()}>Add Images</button>
+                </>
+              )}
+              <input type="file" ref={postFileInputRef} accept='image/*' multiple hidden onChange={pickPostImages} />
+              <input type="file" ref={coverInputRef} accept='image/*' hidden onChange={pickCover} />
+            </div>
+            {!isEvent && (
+              <div>
+                <div className="form-group">
+                  <label htmlFor="caption">Caption</label>
+                  <textarea name="caption" id="caption" value={post.caption} onChange={onChangePost} placeholder='Write a caption...' rows={3}/>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="location">Location</label>
+                  <input type="text" name="location" id="location" value={post.location} onChange={onChangePost} placeholder="Add a location" />
+                </div>
+              </div>
             )}
-            <input type="file" ref={postFileInputRef} accept='image/*' multiple hidden onChange={pickPostImages} />
-            <input type="file" ref={coverInputRef} accept='image/*' hidden onChange={pickCover} />
-          </div>
-          {!isEvent && (
+          
+            {isEvent && (
+              <div>
+                <div className='form-group'>
+                  <label htmlFor="title">Title</label>
+                  <input type="text" name='title' value={eventFields.title} onChange={onChangeEvent} placeholder='Enter event title' required />
+                </div>
+                <div className='form-group'>
+                  <label htmlFor="description">Description</label>
+                  <textarea name="description" id="description" value={eventFields.description} onChange={onChangeEvent} rows={4} placeholder='Write a description of your event' required/>
+                </div>
+                <div className='form-group'>
+                  <label htmlFor="start_time">Event Date</label>
+                  <input type="date" name="start_time" id="start_time" value={eventFields.start_time} onChange={onChangeEvent} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="street_address">Street Address</label>
+                  <input type="text" name="street_address" id="street_address" value={eventFields.street_address} onChange={onChangeEvent} placeholder="Street address (optional)" />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="city">City</label>
+                    <input type="text" name='city' value={eventFields.city} onChange={onChangeEvent} placeholder="City" required />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="state">State</label>
+                    <input type="text" name="state" id="state" value={eventFields.state} onChange={onChangeEvent} placeholder="State" required />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="zipcode">Zip Code</label>
+                    <input type="text" name="zipcode" id="zipcode" value={eventFields.zipcode} onChange={onChangeEvent} placeholder="Zip code" required />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="country">Country</label>
+                    <input type="text" name="country" id="country" value={eventFields.country} onChange={onChangeEvent} placeholder="Country" required />
+                  </div>
+                </div>  
+              </div>
+            )}
+            {error && (<div className="message-box error">{error}</div>)}
+            {success && (<div className="message-box success">{success}</div>)}
             <div>
-              <div>
-                <label htmlFor="caption">Caption</label>
-                <textarea name="caption" id="caption" value={post.caption} onChange={onChangePost} placeholder='Write a caption...' rows={3}/>
-              </div>
-              <div>
-                <label htmlFor="location">Location</label>
-                <input type="text" name="location" id="location" value={post.location} onChange={onChangePost} />
-              </div>
+              <button type='submit' disabled={submitting} className="submit-btn">{submitting ? "Submitting..." : isEvent ? "Post Event" : "Post"}</button>
             </div>
-          )}
-        
-          {isEvent && (
-            <div>
-              <div className='title-container'>
-                <label htmlFor="title">Title</label>
-                <input type="text" name='title' value={eventFields.title} onChange={onChangeEvent} placeholder='Enter event title' required />
-              </div>
-              <div className='description-container'>
-                <label htmlFor="description">Description</label>
-                <textarea name="description" id="description" value={eventFields.description} onChange={onChangeEvent} rows={4} placeholder='Write a description of your event' required/>
-              </div>
-              <div className='data-container'>
-                <label htmlFor="start_time">Event Date</label>
-                <input type="date" name="start_time" id="start_time" value={eventFields.start_time} onChange={onChangeEvent} required />
-              </div>
-              <div className="address">
-                <label htmlFor="street_address">Street Address</label>
-                <input type="text" name="street_address" id="street_address" value={eventFields.street_address} onChange={onChangeEvent} />
-              </div>
-              <div>
-                <div>
-                  <label htmlFor="city">City</label>
-                  <input type="text" name='city' value={eventFields.city} onChange={onChangeEvent} required />
-                </div>
-                <div>
-                  <label htmlFor="state">State</label>
-                  <input type="text" name="state" id="state" value={eventFields.state} onChange={onChangeEvent} required />
-                </div>
-              </div>
-              <div>
-                <div>
-                  <label htmlFor="zipcode">ZipCode</label>
-                  <input type="text" name="zipcode" id="zipcode" value={eventFields.zipcode} onChange={onChangeEvent} required />
-                </div>
-                <div>
-                  <label htmlFor="country">Country</label>
-                  <input type="text" name="country" id="country" value={eventFields.country} onChange={onChangeEvent} required />
-                </div>
-              </div>  
-            </div>
-          )}
-          {error && (<div>{error}</div>)}
-          {success && (<div>{success}</div>)}
-          <div>
-            <button type='submit' disabled={submitting} className={`${submitting ? "bg-gray-400" : "bd-black"}`}>{submitting ? "Submitting..." : isEvent ? "Post Event" : "Post"}</button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </>
   )

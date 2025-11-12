@@ -1,0 +1,12 @@
+.event-filters{
+	display:flex;
+	gap:8px;
+	align-items:center;
+}
+.filter-chip{
+	padding:8px 10px;
+	border-radius:999px;
+	background:var(--muted-surface);
+	color:var(--muted);
+	border:1px solid var(--border);
+}

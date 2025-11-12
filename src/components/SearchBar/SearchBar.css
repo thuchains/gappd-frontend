@@ -1,0 +1,29 @@
+.searchbar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--muted-surface);
+  border:1px solid var(--border);
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+.searchbar-input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:14px;
+  background:transparent;
+  color:var(--text);
+}
+
+.searchbar-input::placeholder{ color:var(--muted) }
+
+.searchbar-clear{
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  color:var(--muted);
+}

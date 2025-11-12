@@ -1,0 +1,8 @@
+.comment-list { display: flex; flex-direction: column; gap: 8px; }
+.comment-item {
+	background: var(--muted-surface);
+	border: 1px solid var(--border);
+	padding: 8px 10px;
+	border-radius: 8px;
+}
+.comment-meta { color: var(--muted); font-size: 13px; }

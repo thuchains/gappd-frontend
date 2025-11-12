@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import PostCard from '../../components/PostCard/PostCard'
+import './HomeView.css'
 
 const timeAgo = (dateString) => {
   const then = new Date(dateString)
@@ -159,33 +160,34 @@ const HomeView = () => {
     }
   }
 
-  const addComment = async (postId, text) => {
+  const addComment = async (postId) => {
     setFeed((prev) => prev.map((p) => p.id === postId ? {...p, comments_count: (p.comments_count || 0) + 1} : p))
   }
 
   return (
     <>
-      <div>
-        {error && (<div>{error}</div>)}
-        {!feed.length && !error ? (
-          <div>
-            <p>Your feed is empty</p>
-            <p>Follow people or create a post to see content here.</p>
-          </div>
-        ): null}
-        <ul>
-          {feed.map((post) => (
-            <li key={post.id}>
-              <PostCard post={post} timeago={timeAgo} onLike={() => toggleLike(post.id, !!post.liked)} onAddComment={(id, text) => addComment(id, text)} mapUser={(u) => ({username: u?.username, firstName: u?.first_name, lastName: u?.last_name})}/>
-            </li>
-          ))}
-        </ul>
-          <div ref={sentinelRef} />
-          {loadingMore && <p>Loading...</p>}
-          {!hasMore && feed.length > 0 && (
-            <p>You're all caught up!</p>
-          )}
-
+      <div className="home-view-container">
+        <div className="home-view-feed">
+          {error && (<div>{error}</div>)}
+          {!feed.length && !error ? (
+            <div>
+              <p>Your feed is empty</p>
+              <p>Follow people or create a post to see content here.</p>
+            </div>
+          ): null}
+          <ul>
+            {feed.map((post) => (
+              <li key={post.id}>
+                <PostCard post={post} timeago={timeAgo} onLike={() => toggleLike(post.id, !!post.liked)} onAddComment={(id) => addComment(id)} mapUser={(u) => ({username: u?.username, firstName: u?.first_name, lastName: u?.last_name})}/>
+              </li>
+            ))}
+          </ul>
+            <div ref={sentinelRef} />
+            {loadingMore && <p>Loading...</p>}
+            {!hasMore && feed.length > 0 && (
+              <p>You're all caught up!</p>
+            )}
+        </div>
       </div>
     </>
   )

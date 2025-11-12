@@ -1,0 +1,18 @@
+.theme-toggle{ display:inline-flex; align-items:center }
+
+/* Switch base */
+.switch{ position:relative; display:inline-block; width:48px; height:28px }
+.switch input{ opacity:0; width:0; height:0; position:absolute }
+
+.slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background: var(--muted-surface); border-radius:999px; transition: background var(--transition), box-shadow var(--transition); border:1px solid var(--border) }
+.slider:before{ content:''; position:absolute; height:22px; width:22px; left:3px; top:3px; background: var(--surface); border-radius:50%; box-shadow: 0 2px 6px rgba(2,6,23,0.25); transition: transform var(--transition) }
+
+/* checked (light theme) */
+.switch input:checked + .slider{ background: var(--accent); border-color: rgba(0,0,0,0.06) }
+.switch input:checked + .slider:before{ transform: translateX(20px) }
+
+/* focus */
+.switch input:focus + .slider{ box-shadow: 0 0 0 4px rgba(176,106,58,0.08) }
+
+/* smaller footprint when used inline */
+.theme-toggle .slider{ height:28px }

@@ -1,0 +1,22 @@
+
+.like-btn{
+	background:transparent;
+	border:none;
+	color:var(--muted);
+	cursor:pointer;
+	display:flex;
+	gap:8px;
+	align-items:center;
+	padding:6px 10px;
+	font-size:18px; /* bigger icon */
+	border-radius:10px;
+	transition:transform 120ms ease, color 120ms ease, background 120ms ease;
+}
+
+.like-btn .like-count{ margin-left:6px; font-weight:600; font-size:14px }
+
+.like-btn.liked{ color:var(--danger); transform:scale(1.06) }
+.like-btn:hover{ background:var(--glass); transform:translateY(-2px) }
+
+.like-btn:focus{ outline:2px solid rgba(255,59,48,0.12); outline-offset:2px }
+

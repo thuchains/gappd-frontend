@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import { useAuth } from './context/AuthContext'
 import EventDetailView from './views/EventDetailView/EventDetailView'
 import NavBar from './components/NavBar/NavBar'
+import SearchView from './views/SearchView/SearchView'
 
 const RootPath = () => {
   const { isAuthenticated } = useAuth()
@@ -21,17 +22,18 @@ const RootPath = () => {
 
 
 function App() {
-  const { token } = useAuth()
+  // NavBar is now always rendered; Auth state is consumed inside NavBar when needed.
   
   return (
     <>
       <BrowserRouter>
-      {token && <NavBar />}
+      <NavBar />
         <Routes>
           <Route path='/' element={<RootPath/>}/>
           <Route path='/login' element={<LoginView/>}/>
           <Route path='/register' element={<RegisterView/>}/>
           <Route path='/explore/events' element={<ExploreEventsView/>}/>
+          <Route path='/search' element={<ProtectedRoute><SearchView/></ProtectedRoute>} />
           <Route path='/events/:id' element={<EventDetailView/>}/>
           <Route path='/profile/:username' element={<ProfileView/>}/>
           <Route path='/home' element={<ProtectedRoute><HomeView/></ProtectedRoute>}/>

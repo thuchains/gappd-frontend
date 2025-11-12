@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { Navigate, useNavigate, Outlet } from 'react-router-dom'
 import { useRef } from 'react'
+import './SettingsView.css'
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle'
 
 const SettingsView = () => {
   const { logout, user, updateUser, updateProfilePicture, deleteUser, API_URL, token } = useAuth()
@@ -144,88 +146,106 @@ const SettingsView = () => {
 
   return (
     <>
-      <div>
-        <h1>Settings</h1>
-        <section>
-          <h2>Profile Picture</h2>
-          <div>
-            <div>
-              {avatarPreview ? (
-                <img src={avatarPreview} alt="New avatar" />
-              )
-              :
-              currentAvatarUrl ? (
-                <img src={currentAvatarUrl} alt='Current avatar'/>
-              )
-              :
-              (<div>
-                <p>No image</p>
-              </div>
-              )}
-            </div>
-            <div>
-              <input type="file" ref={fileInputRef} accept='image/*' onChange={onPickAvatar} />
-              <div>
-                <button onClick={onUploadAvatar} disabled={savingAvatar}>Upload</button>
-                {avatarPreview && (
-                  <button type='button' onClick={() => {setAvatarFile(null); setAvatarPreview(""); setAvatarError(""); setAvatarOk(""); if (fileInputRef.current) fileInputRef.current.value = ""}}>Clear</button>
+      <div className="settings-view-container">
+        <div className="settings-view-content">
+          <h1>Settings</h1>
+          
+          <section className="settings-section">
+            <h2>Profile Picture</h2>
+            <div className="avatar-preview-container">
+              <div className="avatar-display">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="New avatar" />
+                )
+                :
+                currentAvatarUrl ? (
+                  <img src={currentAvatarUrl} alt='Current avatar'/>
+                )
+                :
+                (<div className="avatar-display-empty">
+                  <p>No image</p>
+                </div>
                 )}
               </div>
-            </div>
-          </div>
-          {avatarError && <div>{avatarError}</div>}
-          {avatarOk && <div>{avatarOk}</div>}
-        </section>
-        <section>
-          <h2>Profile</h2>
-          <form onSubmit={onSaveProfile}>
-            <div>
-              <div>
-                <label htmlFor="firstName">First Name</label>
-                <input type="text" name='firstName' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-              </div>
-              <div>
-                <label htmlFor="lastName">Last Name</label>
-                <input type="text" name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+              <div className="avatar-controls">
+                <label className="avatar-input-label">
+                  📁 Choose Image
+                  <input type="file" ref={fileInputRef} accept='image/*' onChange={onPickAvatar} />
+                </label>
+                <div className="avatar-buttons">
+                  <button onClick={onUploadAvatar} disabled={savingAvatar}>{savingAvatar ? "Uploading..." : "Upload"}</button>
+                  {avatarPreview && (
+                    <button type='button' className="secondary" onClick={() => {setAvatarFile(null); setAvatarPreview(""); setAvatarError(""); setAvatarOk(""); if (fileInputRef.current) fileInputRef.current.value = ""}}>Clear</button>
+                  )}
+                </div>
               </div>
             </div>
-            <div>
-              <label htmlFor="username">Username</label>
-              <input type="text" name='username' value={username} onChange={(e) => setUsername(e.target.value)}/>
+            {avatarError && <div className="message-box error">{avatarError}</div>}
+            {avatarOk && <div className="message-box success">{avatarOk}</div>}
+          </section>
+
+          <section className="settings-section">
+            <h2>Appearance</h2>
+            <div className="appearance-controls">
+              <p className="appearance-label">Theme</p>
+              <ThemeToggle />
             </div>
-            <div>
-              <label htmlFor="email">Email</label>
-              <input type="email" name='email' value={email} onChange={(e) => setEmail(e.target.value)} />
+          </section>
+
+          <section className="settings-section">
+            <h2>Profile Information</h2>
+            <form onSubmit={onSaveProfile} className="settings-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="firstName">First Name</label>
+                  <input type="text" id="firstName" name='firstName' placeholder="Your first name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lastName">Last Name</label>
+                  <input type="text" id="lastName" name="lastName" placeholder="Your last name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input type="text" id="username" name='username' placeholder="Your unique username" value={username} onChange={(e) => setUsername(e.target.value)}/>
+              </div>
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input type="email" id="email" name='email' placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label htmlFor="bio">Bio</label>
+                <input type="text" id="bio" name='bio' value={bio} onChange={(e) => setBio(e.target.value)} placeholder='Tell people about yourself...'/>
+              </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <input type="password" id="password" name='password' placeholder="Leave blank to keep current password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+              <div>
+                <button type='submit' disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+              </div>
+              {error && <div className="message-box error">{error}</div>}
+              {ok && <div className="message-box success">{ok}</div>}
+            </form>
+          </section>
+
+          <section className="settings-section">
+            <h2>Delete Account</h2>
+            <div className="delete-warning">
+              ⚠️ Deleting your account is permanent and cannot be undone. All your posts, events, and profile data will be deleted.
             </div>
-            <div>
-              <label htmlFor="password">Password</label>
-              <input type="password" name='password' value={password} onChange={(e) => setPassword(e.target.value)} />
+            <div className="delete-confirmation">
+              <input type="text" placeholder='Type "DELETE" (all caps) to confirm' value={confirmDelete} onChange={(e) =>setConfirmDelete(e.target.value)} />
+              <button className="delete-button" onClick={onDelete} disabled={deleting}>{deleting ? "Deleting..." : "Delete Account"}</button>
             </div>
-            <div>
-              <label htmlFor="bio">Bio</label>
-              <input type="text" name='bio' value={bio} onChange={(e) => setBio(e.target.value)} placeholder='Tell people about yourself...'/>
-            </div>
-            <div>
-              <button type='submit' disabled={saving}>Save Changes</button>
-            </div>
-            {error && <div>{error}</div>}
-            {ok && <div>{ok}</div>}
-          </form>
-        </section>
-        <section>
-          <h2>Delete Account</h2>
-          <p>Deleting your account is permanent. This cannot be undone.</p>
-          <div>
-            <input type="text" placeholder='Type DELETE to confirm' value={confirmDelete} onChange={(e) =>setConfirmDelete(e.target.value)} />
-            <button onClick={onDelete} disabled={deleting}>Delete Account</button>
+            {deleteError && <div className="message-box error">{deleteError}</div>}
+          </section>
+
+          <div className="settings-actions">
+            <button className="secondary" onClick={onLogout}>Logout</button>
           </div>
-          {deleteError && <div>{deleteError}</div>}
-        </section>
-        <div>
-          <button onClick={onLogout}>Logout</button>
         </div>
       </div>
-
     </>
   )
 }

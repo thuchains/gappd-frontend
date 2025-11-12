@@ -1,0 +1,21 @@
+.search-view{
+  max-width:760px;
+  margin:28px auto;
+  padding:10px 16px;
+}
+
+.search-title{
+  margin:0 0 12px;
+  font-size:20px;
+  color:var(--text);
+}
+
+.search-loading,.search-error,.no-results{
+  margin-top:12px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.search-results{ margin-top:12px; display:grid; gap:10px }
+
+.search-view .card{ padding:12px }

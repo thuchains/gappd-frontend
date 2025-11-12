@@ -86,7 +86,7 @@ const ExploreEventsView = () => {
                     events.length === 0 ? (<div>No events found for that date</div>) 
                 : 
                     (<div>{events.map((event) => (
-                    <Link key={String(event.id)} to={`/events/${event.id}`}><EventCard event={event}/></Link>
+                        <EventCard key={event.id} event={event}/>
                     ))}
                     </div>
                 )}

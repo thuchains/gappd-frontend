@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import './RegisterView.css'
 
 const RegisterView = () => {
   const navigate = useNavigate()
@@ -92,47 +93,46 @@ const RegisterView = () => {
 
   return (
     <>
-      <div>
-        <form onSubmit={onSubmit}>
-          <div className='name-container'>
-            <div>
-              <label htmlFor="firstName">First Name</label>
-              <input type="text" id='firstName' name='firstName' value={form.firstName} onChange={(e) => setForm((f) => ({...f, firstName: e.target.value}))}/>
+      <div className="register-view-container">
+        <div className="register-view-card">
+          <h2>Create Account</h2>
+          <form onSubmit={onSubmit} className="register-form">
+            <div className='form-row'>
+              <div className="form-group">
+                <label htmlFor="firstName">First Name</label>
+                <input type="text" id='firstName' name='firstName' placeholder='First name' value={form.firstName} onChange={(e) => setForm((f) => ({...f, firstName: e.target.value}))}/>
+              </div>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input type="text" id='lastName' name='lastName' placeholder='Last name' value={form.lastName} onChange={(e) => setForm((f) => ({...f, lastName: e.target.value}))}/>
+              </div>
             </div>
-            <div>
-              <label htmlFor="lastName">Last Name</label>
-              <input type="text" id='lastName' name='lastName' value={form.lastName} onChange={(e) => setForm((f) => ({...f, lastName: e.target.value}))}/>
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <input type="text" id='username' name='username' placeholder='Your unique username' value={form.username} onChange={(e) => setForm((f) => ({ ...f, username: e.target.value}))}/>
+              <div className="form-hint">3-20 characters (letters, numbers, underscores)</div>
             </div>
-          </div>
-          <div className='username-container'>
-            <label htmlFor="username">Username</label>
-            <input type="text" id='username' name='username' value={form.username} onChange={(e) => setForm((f) => ({ ...f, username: e.target.value}))}/>
-            <p>3-20 characters (letters, numbers, underscores. Must be unique)</p>
-          </div>
-          <div className='email-container'>
-            <label htmlFor="email">Email</label>
-            <input type="email" name='email' value={form.email} onChange={(e) => setForm((f) => ({...f, email: e.target.value}))}/>
-          </div>
-          <div className='password-container'>
-            <div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input type="email" name='email' placeholder='your@email.com' value={form.email} onChange={(e) => setForm((f) => ({...f, email: e.target.value}))}/>
+            </div>
+            <div className="form-group">
               <label htmlFor="password">Password</label>
-              <input type="password" name="password" id="password" value={form.password} onChange={(e) => setForm((f) => ({...f, password: e.target.value}))}/>
-              <p>Must be at least 8 characters.</p>
+              <input type="password" name="password" id="password" placeholder='At least 8 characters' value={form.password} onChange={(e) => setForm((f) => ({...f, password: e.target.value}))}/>
+              <div className="form-hint">Must be at least 8 characters</div>
             </div>
+            <div className="form-group">
+              <label htmlFor="dob">Date of Birth</label>
+              <input type="date" name="dob" id="dob" value={form.dob} onChange={(e) => setForm((f) => ({...f, dob: e.target.value}))} />
+              <div className="form-hint">You must be at least 13 years old</div>
+            </div>
+            <div className="terms-text">By signing up, you agree to our Terms, Privacy Policy and Cookies Policy.</div>
+            <button type='submit' disabled={submitting}>{submitting ? "Creating Account..." : "Create Account"}</button>
+            {error ? (<div className="register-error">{error}</div>) : null}
+          </form>
+          <div className="register-login-link">
+            Already have an account? <Link to="/login">Sign in</Link>
           </div>
-          <div className='dob-container'>
-            <label htmlFor="dob">Date of Birth</label>
-            <input type="date" name="dob" id="dob" value={form.dob} onChange={(e) => setForm((f) => ({...f, dob: e.target.value}))} />
-          </div>
-          <p>By signing up, you agree to our Terms, Privacy Policy and Cookies Policy.</p>
-          <button type='submit' disabled={submitting}>Create Account</button>
-        </form>
-        <div className='login'>
-          <p>Have an account?{" "}
-          <Link to="/login">Log in</Link>
-          </p>
-
-          {error ? (<div>{error}</div>) : null}
         </div>
       </div>
     </>

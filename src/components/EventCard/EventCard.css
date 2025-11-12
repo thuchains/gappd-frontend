@@ -1,0 +1,10 @@
+/* EventCard - dark minimal */
+.eventcard{
+	border-radius:12px;
+	background:var(--muted-surface);
+	border:1px solid var(--border);
+	padding:12px;
+}
+
+.eventcard-title{ font-weight:700; color:var(--text); font-size:16px }
+.eventcard-meta{ color:var(--muted); font-size:13px; margin-top:6px }
