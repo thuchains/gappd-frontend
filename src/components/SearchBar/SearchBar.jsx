@@ -31,7 +31,7 @@ export default function SearchBar({ onSearch, placeholder = 'Search…' }) {
   return (
     <div className="searchbar">
       <input className="searchbar-input" type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder={placeholder} aria-label="Search users"/>
-      <button className="searchbar-clear" onClick={() => setQuery('')} aria-label="Clear" title="Clear">×</button>
+      <button className="searchbar-clear" onClick={() => setQuery('')} aria-label="Clear" title="Clear">x</button>
     </div>
   )
 }
