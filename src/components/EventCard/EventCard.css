@@ -1,10 +1,211 @@
-/* EventCard - dark minimal */
-.eventcard{
+/* EventCard - compact card with avatar at top, labeled fields (Partiful-style) */
+article[data-event-id]{
 	border-radius:12px;
+	overflow:hidden;
 	background:var(--muted-surface);
 	border:1px solid var(--border);
-	padding:12px;
+	transition:transform var(--transition), box-shadow var(--transition);
+	/* make card similar to PostCard size */
+	max-width:720px;
+	width:100%;
+	display:flex;
+	flex-direction:column;
+	height:100%;
+	margin: 12px auto; /* center in list */
 }
 
-.eventcard-title{ font-weight:700; color:var(--text); font-size:16px }
-.eventcard-meta{ color:var(--muted); font-size:13px; margin-top:6px }
+article[data-event-id]:hover{
+	transform:translateY(-2px);
+	box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Header with avatar and host info at top */
+.eventcard-header{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:8px;
+	padding:8px 10px;
+	border-bottom:1px solid var(--border);
+}
+
+.eventcard-host-top{
+	display:flex;
+	align-items:center;
+	gap:8px;
+	text-decoration:none;
+	color:var(--text);
+	flex:1;
+	min-width:0;
+}
+
+.eventcard-host-top:hover{
+	text-decoration:underline;
+}
+
+.eventcard-host-top > div{
+	display:flex;
+	flex-direction:column;
+	gap:2px;
+	min-width:0;
+}
+
+.eventcard-host-name{
+	font-weight:700;
+	font-size:13px;
+	color:var(--text);
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+
+.eventcard-organizer{
+	font-size:10px;
+	color:var(--accent);
+	font-weight:600;
+	text-transform:uppercase;
+}
+
+.eventcard-host-top .avatar-wrap{
+	width:32px;
+	height:32px;
+	padding:2px;
+	flex-shrink:0;
+}
+
+.eventcard-host-top .avatar-img{
+	width:100%;
+	height:100%;
+	border-radius:50%;
+	object-fit:cover;
+}
+
+/* Owner action buttons */
+.eventcard-owner-actions{
+	display:flex;
+	gap:4px;
+	flex-shrink:0;
+}
+
+.eventcard-owner-actions button{
+	background:transparent;
+	border:1px solid var(--border);
+	color:var(--text);
+	width:24px;
+	height:24px;
+	padding:0;
+	border-radius:4px;
+	cursor:pointer;
+	font-size:12px;
+	transition:background var(--transition), color var(--transition);
+}
+
+.eventcard-owner-actions button:hover{
+	background:var(--glass);
+	color:var(--accent);
+}
+
+/* Image section */
+.eventcard-image-wrap{
+	position:relative;
+	width:100%;
+	/* keep image height similar to PostCard media */
+	height:220px;
+	background:#000;
+	overflow:hidden;
+	flex-shrink:0;
+}
+
+.eventcard-image-wrap img{
+	display:block;
+	width:100%;
+	height:100%;
+	object-fit:cover;
+	transition:transform var(--transition);
+}
+
+.eventcard-image-wrap:hover img{
+	transform:scale(1.02);
+}
+
+/* Content section with labeled fields */
+.eventcard-content{
+	display:flex;
+	flex-direction:column;
+	gap:6px;
+	padding:8px;
+	flex-grow:1;
+	font-size:12px;
+}
+
+/* Field wrapper - label + value */
+.eventcard-field{
+	display:block;
+	line-height:1.4;
+}
+
+.eventcard-label{
+	font-size:10px;
+	color:var(--muted);
+	font-weight:700;
+	text-transform:uppercase;
+	letter-spacing:0.5px;
+	display:inline;
+}
+
+/* Title field */
+.eventcard-title{
+	margin:0;
+	font-weight:700;
+	font-size:14px;
+	color:var(--text);
+	display:inline;
+}
+
+/* Date field */
+.eventcard-date{
+	color:var(--accent);
+	font-weight:600;
+	font-size:12px;
+	display:inline;
+}
+
+/* Location field */
+.eventcard-location{
+	color:var(--text);
+	font-size:12px;
+	display:inline;
+}
+
+/* Description field */
+.eventcard-description{
+	margin:0;
+	color:var(--text);
+	font-size:11px;
+	line-height:1.3;
+	display:inline;
+}
+
+/* Share button */
+.eventcard-share-btn{
+	background:transparent;
+	border:1px solid var(--border);
+	color:var(--accent);
+	padding:8px 10px;
+	border-radius:6px;
+	cursor:pointer;
+	font-weight:600;
+	font-size:12px;
+	transition:background var(--transition);
+	margin-top:auto;
+}
+
+.eventcard-share-btn:hover{
+	background:var(--glass);
+}
+
+@media (max-width:600px){
+	article[data-event-id]{
+		max-width:100%;
+	}
+}

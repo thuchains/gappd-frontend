@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useId } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import EventCard from '../../components/EventCard/EventCard'
+import './ExploreEventsView.css'
 import { Link, useLocation } from 'react-router-dom'
 
 const ExploreEventsView = () => {
@@ -28,25 +29,24 @@ const ExploreEventsView = () => {
         setError("")
         try {
             const response = await fetch (url)
-             const data = await response.json().catch(() => (Array.isArray(data) ? data: []))
+            const payload = await response.json().catch(() => ({}))
             if (!response.ok) {
-                throw new Error(`Events feed failed ( ${response.status})`)
+                const msg =
+                    payload?.message ||payload?.error || (payload?.errors ? JSON.stringify(payload.errors) : `Request failed (${response.status})`)
+                    throw new Error(msg)
             }
-            if (!response.ok) {
-                throw new Error(data?.message || `Failed to load events (${response.status})`)
-            }
-            const list = Array.isArray(data) ? data : (data?.items || [])
+            const list = Array.isArray(payload) ? payload : (payload?.items || [])
             setEvents(Array.isArray(list) ? list : [])
         } catch (e) {
-            if (e.name !== "AbortError")
-                setEvents([])
-                setError(e.message || "Failed to load events")
+            console.error("Failed to fetch events")
+            setEvents([])
+            setError(e?.message || "Failed to laod events")
         } 
     }, [])
 
     useEffect(() => {
-        fetchEventsFeed(allEventsUrl)
-    }, [allEventsUrl, location.state?.refresh])
+    fetchEventsFeed(allEventsUrl)
+    }, [allEventsUrl, location.state?.refresh, fetchEventsFeed])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -66,30 +66,33 @@ const ExploreEventsView = () => {
 
   return (
     <>
-        <div> 
-            <div>
-                <h1>Explore Events</h1>
-                <p>Enter a date to search</p>
-            </div>
-            <form onSubmit={handleSubmit}>
-                <div className='filters'>
-                    <label htmlFor={dateId}>Date</label>
-                    <input id={dateId} type="date" name="date" className='date' value={date} onChange={(e) => setDate(e.target.value)}/>
-                    <div>
-                        <button className='submit-btn' type='submit'>Search</button>
-                        <button className='clear-btn' type='button' onClick={onClear}>Clear</button>
-                    </div>
+        <div className="explore-root"> 
+            <div className="explore-search-card">
+                <div>
+                    <h1>Explore Events</h1>
+                    <p>Enter a date to search</p>
                 </div>
-            </form>
-                {error ? (<div>{error}</div>) 
-                : 
-                    events.length === 0 ? (<div>No events found for that date</div>) 
-                : 
-                    (<div>{events.map((event) => (
-                        <EventCard key={event.id} event={event}/>
-                    ))}
+                <form onSubmit={handleSubmit}>
+                    <div className='filters'>
+                        <label htmlFor={dateId}>Date</label>
+                        <input id={dateId} type="date" name="date" className='date' value={date} onChange={(e) => setDate(e.target.value)}/>
+                        <div>
+                            <button className='submit-btn' type='submit'>Search</button>
+                            <button className='clear-btn' type='button' onClick={onClear}>Clear</button>
+                        </div>
                     </div>
-                )}
+                </form>
+            </div>
+            {!error && (events.length === 0 ? (<div>No events found for that date</div>
+            ) 
+            : 
+            (
+                <div className="explore-events-grid">
+                    {events.map((event) => (
+                        <EventCard key={event.id ?? `${event.title || "event"}-${event.start_time || ""} `} event={event}/>
+                    ))}
+                </div>
+            ))}
         </div>
     </>
   )

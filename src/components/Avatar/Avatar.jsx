@@ -21,7 +21,7 @@ const Avatar = ({ userId, username, avatar_url, avatar_photo_id, size = 44, upda
     const handleError = () => setSrc(fallback)
 
     return (
-        <span className="avatar-wrap" style={{ width: size, height: size }} aria-hidden>
+        <span className="avatar-wrap" style={{ width: size, height: size }} >
             <img
                 className="avatar-img"
                 src={src || url}

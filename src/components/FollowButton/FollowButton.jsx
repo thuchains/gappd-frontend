@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
 const FollowButton = ({ targetUserId, initialFollowing=false, onChange }) => {

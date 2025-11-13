@@ -38,13 +38,13 @@ const LoginView = () => {
   return (
     <div className="login-view-container">
         <div className="login-view-card">
-            <h2>Sign In</h2>
+            <h2>Login</h2>
             {error && <div className="login-error">{error}</div>}
 
             <form onSubmit={onSubmit} className="login-form">
                 <input type="email" name="email" placeholder='Email' value={email} onChange={(e) => setEmail(e.target.value)} autoComplete='email' required/>
                 <input type="password" name="password" placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} autoComplete='current-password' required/>
-                <button type='submit' disabled={loading}>{loading ? "Signing in..." : "Sign In"}</button>
+                <button type='submit' disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
             </form>
 
             <div className="login-link">

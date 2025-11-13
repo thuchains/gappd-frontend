@@ -12,32 +12,32 @@ const LikeButton = ({ postId, initialCount = 0, initialLiked = false, onChange }
     if (!postId || busy) {
       return
     }
-  setBusy(true)
-  const nextLiked = !liked
-  const delta = nextLiked ? 1 : -1
-  // optimistic update
-  setLiked(nextLiked)
-  setCount((c) => Math.max(0, c + delta))
-  const nextCount = Math.max(0, count + delta)
-  onChange?.({ liked: nextLiked, count: nextCount })
-    try {
-      const response = await fetch(`${API_URL}/posts/${postId}/like`, {
-        method: nextLiked ? "POST" : "DELETE",
-        headers: { Authorization: `Bearer ${token || ""}`}
-      })
-      if (!response.ok) {
-        throw new Error("Like toggle failed")
+    setBusy(true)
+    const nextLiked = !liked
+    const delta = nextLiked ? 1 : -1
+    // optimistic update
+    setLiked(nextLiked)
+    setCount((c) => Math.max(0, c + delta))
+    const nextCount = Math.max(0, count + delta)
+    onChange?.({ liked: nextLiked, count: nextCount })
+      try {
+        const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+          method: nextLiked ? "POST" : "DELETE",
+          headers: { Authorization: `Bearer ${token || ""}`}
+        })
+        if (!response.ok) {
+          throw new Error("Like toggle failed")
+        }
+      } catch (e) {
+        console.error(e)
+    // rollback
+    setLiked(!nextLiked)
+    setCount((c) => Math.max(0, c - delta))
+    onChange?.({ liked: !nextLiked, count: Math.max(0, count - delta) })
+        alert("Like not updated")
+      } finally {
+        setBusy(false)
       }
-    } catch (e) {
-      console.error(e)
-  // rollback
-  setLiked(!nextLiked)
-  setCount((c) => Math.max(0, c - delta))
-  onChange?.({ liked: !nextLiked, count: Math.max(0, count - delta) })
-      alert("Like not updated")
-    } finally {
-      setBusy(false)
-    }
   }, [API_URL, token, postId, liked, busy, onChange, count])
 
   return (

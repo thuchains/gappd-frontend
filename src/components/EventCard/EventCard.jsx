@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { Link } from 'react-router-dom'
 import Avatar from '../Avatar/Avatar'
+import FollowButton from '../FollowButton/FollowButton'
+import './EventCard.css'
 
-const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
+const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true, withinLink = false}) => {
   const navigate = useNavigate()
   const { API_URL, user, token } = useAuth()
+
   const host = useMemo(() => {
     if (event?.host) {
       return event.host
@@ -19,7 +22,10 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
     }
     return {
       id: event?.user_id,
-      username: event?.username
+      username: event?.username,
+      avatar_url: event?.avatar_url,
+      avatar_photo_id: event?.avatar_photo_id,
+      updatedAt: event?.user_updated_at
     }
   }, [event])
 
@@ -30,16 +36,26 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
     const ownerId = host?.id ?? event?.user_id
     return String(ownerId ?? "") === String(user.id ?? "")
   }, [host?.id, event?.user_id, user])
-
+  
   const coverSrc = useMemo(() => {
-    if (event?.cover_photo_url && /^https?:\/\//i.test(event.cover_photo_url)) {
-      return event.cover_photo_url;
-    }
+    if (event?.cover_photo_url) {
+      return event.cover_photo_url
+    } 
     if (event?.cover_photo_id) {
-      return `${API_URL}/photos/${event.cover_photo_id}`;
-    }
+      return `${API_URL}/photos/${event.cover_photo_id}`
+    } 
     return ""
-  }, [API_URL, event?.cover_photo_url, event.cover_photo_id])
+  }, [API_URL, event?.cover_photo_url, event?.cover_photo_id])
+
+  // const coverSrc = useMemo(() => {
+  //   if (event?.cover_photo_url && /^https?:\/\//i.test(event.cover_photo_url)) {
+  //     return event.cover_photo_url;
+  //   }
+  //   if (event?.cover_photo_id) {
+  //     return `${API_URL}/photos/${event.cover_photo_id}`;
+  //   }
+  //   return ""
+  // }, [API_URL, event?.cover_photo_url, event.cover_photo_id])
 
   const startText = useMemo(() => {
     if (!event?.start_time) {
@@ -59,11 +75,14 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
     }
   }, [event?.start_time])
 
+  const HostLink = ({ to, children, ...rest }) =>
+    withinLink ? <span {...rest}>{children}</span> : <Link to={to} {...rest}>{children}</Link>
+
   const handleOpen = useCallback(() => {
-    if (event?.id) {
+    if (!withinLink && event?.id) {
       navigate(`/events/${event.id}`)
     }
-  }, [navigate, event?.id])
+  }, [navigate, event?.id, withinLink])
 
   const handleShare = useCallback(() => {
     if (onShare) {
@@ -75,8 +94,10 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
   }, [onShare, event])
 
   const handleEdit = useCallback(() => {
-    if (onEdit) onEdit(event);
-    else navigate(`/events/${event.id}/edit`);
+    if (onEdit) {
+      return onEdit(event)
+    } 
+    navigate(`/events/${event.id}`);
   }, [onEdit, navigate, event]);
 
   const handleDelete = useCallback(async () => {
@@ -91,11 +112,11 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
       return onDelete(event.id)
     }
     try {
-      const res = await fetch(`${API_URL}/events/${event.id}`, {
+      const response = await fetch(`${API_URL}/events/${event.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token || ""}` },
-      });
-      if (!res.ok) {
+      })
+      if (!response.ok) {
         throw new Error("Delete failed")
       }
       alert("Event successfully deleted");
@@ -110,57 +131,71 @@ const EventCard = ({ event, onEdit, onDelete, onShare, showActions = true}) => {
   return (
     <>
       <article data-event-id={event?.id}>
-      <header>
-        <Link to={`/profile/${host?.username ?? "unknown"}`} aria-label="Host profile">
-          <Avatar userId={host?.id} username={host?.username ?? "user"} avatar_url={host?.avatar_url} avatar_photo_id={host?.avatar_photo_id} />
-        </Link>
-        <div>
-          <div>
-            <Link to={`/profile/${host?.username ?? "unknown"}`}>
-              {host?.username ?? "unknown"}
-            </Link>
-            {!isOwner && host?.id && <FollowButton targetUserId={host.id} />}
-          </div>
-          {startText && <div>{startText}</div>}
-          {(event?.location || event?.city) && (
+        <div className="eventcard-header">
+          <HostLink to={`/profile/${host?.username ?? "unknown"}`} className="eventcard-host-top">
+            <Avatar userId={host?.id} username={host?.username ?? "user"} avatar_url={host?.avatar_url} avatar_photo_id={host?.avatar_photo_id} updatedAt={host?.updatedAt || host?.updated_at} size={40}/>
             <div>
-              {event.location ||
-                [event.city, event.state, event.country].filter(Boolean).join(", ")}
+              <div className="eventcard-host-name">{host?.username ?? "unknown"}</div>
+              {isOwner && <span className="eventcard-organizer">Organizer</span>}
+            </div>
+          </HostLink>
+          {!isOwner && host?.id && <FollowButton targetUserId={host.id} />}
+          {isOwner && (
+            <div className="eventcard-owner-actions">
+              <button type="button" onClick={handleEdit} title="Edit event">✎</button>
+              <button type="button" onClick={handleDelete} title="Delete event">✕</button>
             </div>
           )}
         </div>
-        {isOwner && (
-          <div>
-            <button type="button" onClick={handleEdit}>Edit</button>
-            <button type="button" onClick={handleDelete}>Delete</button>
-          </div>
+
+        {coverSrc && (
+          <section className="eventcard-image-wrap" onClick={handleOpen} style={{ cursor: "pointer" }}>
+            <img
+              alt={event?.title ? `${event.title} cover` : "event cover"}
+              src={coverSrc}
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+          </section>
         )}
-      </header>
-      {coverSrc && (
-        <section onClick={handleOpen} style={{ cursor: "pointer" }}>
-          <img
-            alt={event?.title ? `${event.title} cover` : "event cover"}
-            src={coverSrc}
-            onError={(e) => (e.currentTarget.style.display = "none")}
-          />
-        </section>
-      )}
-      {event?.title && (
-        <section>
-          <h3>{event.title}</h3>
-        </section>
-      )}
-      {event?.description && (
-        <section>
-          <p>{event.description}</p>
-        </section>
-      )}
-      {showActions && (
-        <section>
-          <button type="button" onClick={handleShare}>Share</button>
-        </section>
-      )}
-    </article>
+        
+        <div className="eventcard-content">
+          {/* Title */}
+          {event?.title && (
+            <div className="eventcard-field">
+              <span className="eventcard-label">Event: </span>
+              <h3 className="eventcard-title">{event.title}</h3>
+            </div>
+          )}
+          
+          {startText && (
+            <div className="eventcard-field">
+              <span className="eventcard-label">When: </span>
+              <div className="eventcard-date">{startText}</div>
+            </div>
+          )}
+
+          {(event?.location || event?.city) && (
+            <div className="eventcard-field">
+              <span className="eventcard-label">Location: </span>
+              <div className="eventcard-location">
+                {event.location ||
+                  [event.city, event.state, event.country].filter(Boolean).join(", ")}
+              </div>
+            </div>
+          )}
+
+          {event?.description && (
+            <div className="eventcard-field">
+              <span className="eventcard-label">Description: </span>
+              <p className="eventcard-description">{event.description}</p>
+            </div>
+          )}
+
+          {showActions && (
+            <button className="eventcard-share-btn" type="button" onClick={handleShare}>Share Event</button>
+          )}
+        </div>
+      </article>
     </>
   )
 }

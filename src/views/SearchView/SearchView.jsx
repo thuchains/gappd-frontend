@@ -2,15 +2,19 @@ import React, { useState } from 'react'
 import './SearchView.css'
 import SearchBar from '../../components/SearchBar/SearchBar'
 import UserCard from '../../components/UserCard/UserCard'
+import { useAuth } from '../../context/AuthContext'
 
 export default function SearchView() {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const { API_URL, token } = useAuth()
 
   async function handleSearch(query) {
-    if (!query || query.trim() === '') {
+    const trimmed = (query || '').trim()
+    if (!trimmed) {
       setResults([])
+      setError(null)
       return
     }
 
@@ -18,26 +22,30 @@ export default function SearchView() {
     setError(null)
 
     try {
-      // Replace this endpoint with your real backend search endpoint
-      const res = await fetch(`/api/search/users?q=${encodeURIComponent(query)}`)
-      if (!res.ok) throw new Error('network')
-      const data = await res.json()
+      const url = `${API_URL}/users/search?username=${encodeURIComponent(trimmed)}`
+      const response = await fetch(url, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setResults([])
+          setError(null)
+          return
+        }
+        throw new Error(`Search failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+      // backend returns { users: [...] }
       setResults(data.users || [])
+      setError(null)
     } catch (e) {
       console.warn('search error', e)
-      // If there's no real backend during development, provide a small
-      // client-side fallback so the UI is usable.
-      const sample = [
-        { id: 1, name: 'Ava Stone', username: 'ava', avatar: '/assets/default-avatar.png', bio: 'Hiking & coffee' },
-        { id: 2, name: 'Liam Hart', username: 'liam', avatar: '/assets/default-avatar.png', bio: 'Photography' },
-        { id: 3, name: 'Maya Chen', username: 'maya', avatar: '/assets/default-avatar.png', bio: 'Frontend dev' },
-      ]
-      const filtered = sample.filter(u =>
-        u.name.toLowerCase().includes(query.toLowerCase()) ||
-        u.username.toLowerCase().includes(query.toLowerCase())
-      )
-      setResults(filtered)
-      setError(null)
+      setError('Something went wrong while searching.')
+      setResults([])
     } finally {
       setLoading(false)
     }

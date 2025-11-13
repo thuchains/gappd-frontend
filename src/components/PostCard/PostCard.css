@@ -59,14 +59,45 @@
 .icon-btn.liked, .icon-btn.like-toggle.liked{ color:var(--accent); }
 
 .postcard-likes{ padding:8px 12px; font-weight:600 }
-.postcard-caption{ padding:0 12px 8px 12px }
-.postcard-caption-user{ font-weight:700; margin-right:6px; color:var(--text); text-decoration:none }
+.postcard-caption{
+	padding:8px 12px;
+	display:flex;
+	gap:8px;
+	align-items:flex-start;
+}
+.postcard-caption p{ margin:0; color:var(--text); font-size:14px; line-height:1.3 }
+.postcard-caption-user{ font-weight:700; margin-right:6px; color:var(--text); text-decoration:none; flex-shrink:0 }
 
-.view-comments{ background:transparent; border:none; color:var(--muted); padding:6px 12px; cursor:pointer; text-align:left }
+.view-comments{ display:block; width:100%; background:transparent; border:none; color:var(--muted); padding:8px 12px; cursor:pointer; text-align:left }
 
-.postcard-add-comment{ display:flex; gap:8px; align-items:center; padding:8px 12px; border-top:1px solid var(--border) }
-.add-comment-input{ flex:1; background:transparent; border:none; outline:none; color:var(--text); padding:6px }
-.post-comment-btn{ background:transparent; border:none; color:var(--accent); font-weight:600; cursor:pointer }
+.postcard-add-comment{
+	display:flex;
+	gap:8px;
+	align-items:center;
+	/* extend to card edges while keeping inner padding */
+	width: calc(100% + 24px);
+	margin-left: -12px;
+	margin-right: -12px;
+	padding:12px;
+	box-sizing: border-box;
+	border-top:1px solid var(--border);
+	background: transparent;
+}
+.add-comment-input{
+	flex:1;
+	background:transparent;
+	border:none;
+	outline:none;
+	color:var(--text);
+	padding:6px;
+}
+.post-comment-btn{
+	background:transparent;
+	border:none;
+	color:var(--accent);
+	font-weight:600;
+	cursor:pointer;
+}
 
 @media (max-width:600px){
 	.postcard-media{ height:200px }

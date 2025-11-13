@@ -177,6 +177,15 @@ const PostCard = ({ post, onDelete, onEdit, onShare, showActions=true, compact=f
           </section>
         )}
 
+        {/* Actions under the image: like + share (inline) */}
+        {showActions && (
+          <section className="postcard-actions">
+            <LikeButton postId={post.id} initialCount={post.like_count} />
+            <button type="button" onClick={handleShare} className="icon-btn">Share</button>
+          </section>
+        )}
+
+        {/* Username and caption inline */}
         {post?.caption && (
           <section className="postcard-caption">
             <Link to={`/profile/${author?.username ?? "unknown"}`} className="postcard-caption-user">{author?.username ?? "unknown"}</Link>
@@ -184,15 +193,12 @@ const PostCard = ({ post, onDelete, onEdit, onShare, showActions=true, compact=f
           </section>
         )}
 
-        {showActions && (
-          <section className="postcard-actions">
-            <LikeButton postId={post.id} initialCount={post.like_count} />
-            <button className="view-comments" onClick={toggleComments} type="button">
-              {showComments ? "Hide comments" : `View comments ${formatCount(post.comment_count)}`}
-            </button>
-            <button type="button" onClick={handleShare}>Share</button>
-          </section>
-        )}
+        {/* View comments button at the bottom */}
+        <div style={{ padding: '0 12px 12px' }}>
+          <button className="view-comments" onClick={toggleComments} type="button" style={{ width: '100%', textAlign: 'left' }}>
+            {showComments ? "Hide comments" : `View comments ${formatCount(post.comment_count)}`}
+          </button>
+        </div>
 
         {showComments && (
           <section>

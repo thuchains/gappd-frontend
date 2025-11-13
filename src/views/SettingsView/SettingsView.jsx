@@ -169,7 +169,7 @@ const SettingsView = () => {
               </div>
               <div className="avatar-controls">
                 <label className="avatar-input-label">
-                  📁 Choose Image
+                  📁 Change photo
                   <input type="file" ref={fileInputRef} accept='image/*' onChange={onPickAvatar} />
                 </label>
                 <div className="avatar-buttons">
