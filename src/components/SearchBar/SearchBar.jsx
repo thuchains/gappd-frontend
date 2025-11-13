@@ -4,18 +4,29 @@ import './SearchBar.css'
 export default function SearchBar({ onSearch, placeholder = 'Search…' }) {
   const [query, setQuery] = useState('')
   const debounceRef = useRef(null)
+  const onSearchRef = useRef(onSearch)
 
   useEffect(() => {
-    // debounce input
-    if (debounceRef.current) clearTimeout(debounceRef.current)
+    onSearchRef.current = onSearch
+  }, [onSearch])
+
+  useEffect(() => {
+    if (!onSearchRef.current) {
+        return
+    }
+    if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+    }
     debounceRef.current = setTimeout(() => {
-      onSearch(query)
+      onSearchRef.current(query)
     }, 350)
 
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+      }
     }
-  }, [query, onSearch])
+  }, [query, onSearchRef])
 
   return (
     <div className="searchbar">

@@ -31,6 +31,8 @@ const Avatar = ({ userId, username, avatar_url, avatar_photo_id, size = 44, upda
                 onError={handleError}
             />
         </span>
+        
+
     )
 }
 
